@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+from fastapi.responses import JSONResponse
 
 class Node:
     def __init__(self, data):
@@ -33,33 +35,36 @@ class Queue:
             self.curr = new_node
         self.size += 1
 
+        return new_node.data
+
     def next_node(self):
         curr = self.curr
+        if curr == self.tail:
+            raise HTTPException(status_code=409, detail="Cannot go past the end of the Queue")
+        
         curr = curr.next
-
-        # Set the new curr position in the queue
+        # Update curr
         self.curr = curr
 
-        # Testing purposes
-        print(curr.data)
+        return curr.data
 
     def prev_node(self):
-        curr = self.head
-        pass
-
-song_ex1 = { "name": "Quiere", "file_path": "beep boop...", "artist": "dei v", "album": "Los Flavorz" }  
-song_ex2 = { "name": "Toa", "file_path": "beep boop...", "artist": "dei v", "album": "Los Flavorz" }
-song_ex3 = { "name": "Sirena", "file_path": "beep boop...", "artist": "dei v", "album": "Los Flavorz" } 
+        curr = self.curr
+        if curr == self.head:
+            raise HTTPException(status_code=409, detail="Cannot go past the beginning of the Queue")
     
-def test():
+        curr = curr.prev
+        # Update curr
+        self.curr = curr
+
+        return curr.data
+
+jukebox = None
+
+def create_queue():
+    global jukebox
+    if jukebox is not None:
+        return JSONResponse(status_code=409, content={"message": "Queue already exists"})
+
     jukebox = Queue()
-    jukebox.enqueue(song_ex1)
-    jukebox.enqueue(song_ex2)
-    jukebox.enqueue(song_ex3)
-
-    jukebox.next_node()
-    jukebox.next_node()
-
-    #jukebox.prev_node()
-
-test()
+    return JSONResponse(status_code=200, content={"message": "Sucessfully created a Queue"})
