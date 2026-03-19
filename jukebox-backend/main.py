@@ -46,17 +46,11 @@ def enqueue_song(song : dict):
 
 @app.get("/next")
 def next_song():
-    song = audio.jukebox.next_node()
-    if song is None:
-        raise HTTPException(status_code=404, detail="End of Queue")
-    return song
+    return audio.jukebox.next_node()
     
 @app.get("/back")
 def prev_song():
-    song = audio.jukebox.prev_node()
-    if song is None:
-        raise HTTPException(status_code=404, detail="Went past head of Queue")
-    return song
+    return audio.jukebox.prev_node()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
