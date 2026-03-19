@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 import library
+import audio
 
 app = FastAPI()
 
@@ -22,6 +23,7 @@ def home():
 def test():
     return {"status": "success", "data": "Hello from backend"}
 
+# Library Endpoints
 @app.get("/library")
 def get_library():
     return library.get_library()
@@ -32,6 +34,29 @@ def get_song(name: str):
     if result is None:
         raise HTTPException(status_code=404, detail="Song not found")
     return result
+
+# Queue Endpoints
+@app.post("/create")
+def create_queue():
+    return audio.create_queue()
+
+@app.post("/add")
+def enqueue_song(song : dict):
+    return audio.jukebox.enqueue(song)
+
+@app.get("/next")
+def next_song():
+    song = audio.jukebox.next_node()
+    if song is None:
+        raise HTTPException(status_code=404, detail="End of Queue")
+    return song
+    
+@app.get("/back")
+def prev_song():
+    song = audio.jukebox.prev_node()
+    if song is None:
+        raise HTTPException(status_code=404, detail="Went past head of Queue")
+    return song
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
