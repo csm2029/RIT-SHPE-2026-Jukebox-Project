@@ -36,6 +36,8 @@ class Queue:
     def next_node(self):
         curr = self.curr
         curr = curr.next
+
+        # Set the new curr position in the queue
         self.curr = curr
 
         # Testing purposes
