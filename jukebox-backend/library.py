@@ -2,7 +2,6 @@ from tinytag import TinyTag
 import os
 
 # hardcoded for now for testing purposes
-# need to change this to your file path
 MUSIC_FOLDER = r"C:\Users\atene\Documents\RIT-SHPE-2026-Jukebox-Project\jukebox-backend\music"
 
 def get_library():
@@ -60,5 +59,6 @@ def find_song(song_name: str):
         if song["name"].lower() == song_name.lower():
             return song
     return None
+
 
  
