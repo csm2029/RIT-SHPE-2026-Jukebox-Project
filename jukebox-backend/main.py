@@ -45,6 +45,10 @@ def create_queue():
 def enqueue_song(song : dict):
     return audio.jukebox.enqueue(song)
 
+@app.delete("/delete")
+def dequeue_song( song: dict):
+    return audio.jukebox.dequeue(song)
+
 @app.get("/next")
 def next_song():
     # Move to the next song in the queue
