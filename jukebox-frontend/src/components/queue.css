@@ -1,0 +1,198 @@
+.queue {
+  background: rgba(15, 10, 35, 0.7);
+  border: 1px solid rgba(255, 106, 0, 0.2);
+  border-top: 2px solid #ff6a00;
+  border-radius: 16px;
+  padding: 20px;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 30px rgba(255, 106, 0, 0.05), inset 0 1px 0 rgba(255, 106, 0, 0.1);
+}
+
+.queue-header {
+  margin-bottom: 16px;
+}
+
+.queue-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ff6a00;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(255, 106, 0, 0.6);
+}
+
+.queue-count {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: 'Space Mono', monospace;
+}
+
+.queue-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 106, 0, 0.3) transparent;
+}
+
+.queue-list::-webkit-scrollbar { width: 4px; }
+.queue-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 106, 0, 0.3);
+  border-radius: 4px;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  border: 1px solid transparent;
+  transition: background 0.2s;
+}
+
+.queue-item:hover {
+  background: rgba(255, 106, 0, 0.07);
+}
+
+.queue-item--active {
+  background: rgba(255, 106, 0, 0.12);
+  border-color: rgba(255, 106, 0, 0.4);
+  box-shadow: 0 0 12px rgba(255, 106, 0, 0.2);
+}
+
+.queue-index {
+  width: 22px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: 'Space Mono', monospace;
+  flex-shrink: 0;
+}
+
+.playing-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+  justify-content: center;
+}
+
+.playing-bars span {
+  display: block;
+  width: 3px;
+  background: linear-gradient(to top, #ff6a00, #ffe600);
+  border-radius: 2px;
+  animation: bar-bounce 0.8s ease-in-out infinite alternate;
+}
+
+.playing-bars span:nth-child(1) { height: 60%; animation-delay: 0s; }
+.playing-bars span:nth-child(2) { height: 100%; animation-delay: 0.2s; }
+.playing-bars span:nth-child(3) { height: 40%; animation-delay: 0.4s; }
+
+@keyframes bar-bounce {
+  from { transform: scaleY(0.4); }
+  to   { transform: scaleY(1); }
+}
+
+.queue-art {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 106, 0, 0.3), rgba(255, 230, 0, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.queue-song-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-song-name {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.queue-song-artist {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-duration {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: 'Space Mono', monospace;
+  flex-shrink: 0;
+}
+
+.queue-remove-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.queue-remove-btn:hover {
+  border-color: rgba(255, 80, 80, 0.6);
+  color: #ff5050;
+  background: rgba(255, 80, 80, 0.1);
+}
+
+.queue-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.2);
+  font-family: 'Space Mono', monospace;
+}
+
+.queue-empty-icon {
+  font-size: 2rem;
+  opacity: 0.3;
+}
+
+.queue-empty p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.queue-empty-sub {
+  font-size: 0.68rem !important;
+  opacity: 0.6;
+}
