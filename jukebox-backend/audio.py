@@ -63,7 +63,8 @@ class Queue:
 # Class for the audio player with play, pause, volume control, and status
 class AudioPlayer:
     def __init__(self):
-        self.player = vlc.MediaPlayer()
+        instance = vlc.Instance('--vout=dummy', '--aout=alsa', '--no-xlib')
+        self.player = instance.media_player_new()
         self.current_song = None
 
     # Play a song with the given file path
