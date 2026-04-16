@@ -1,8 +1,6 @@
 from tinytag import TinyTag 
 import os
 
-# hardcoded for now for testing purposes
-# need to change this to your file path
 MUSIC_FOLDER = os.path.join(os.path.dirname(__file__), "music")
 
 def get_library():
@@ -62,5 +60,10 @@ def find_song(song_name: str):
             return song
     return None
 
-
- 
+if __name__ == "__main__":
+    count = 0
+    library = get_library()
+    for song in library:
+        print(f"{song['name']} by {song['artist']} from {song['album']} ({song['duration']} ms)")
+        count += 1
+    print(f"Total songs: {count}")
