@@ -1,6 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import asyncio
+
+import library
+import audio
 
 import library
 import audio
@@ -50,11 +54,128 @@ def dequeue_song( song: dict):
 
 @app.get("/next")
 def next_song():
-    return audio.jukebox.next_node()
+    # Move to the next song in the queue
+    next_song_data = audio.jukebox.next_node()
+    # Check if the next song data is valid and has a path, then play it
+    if next_song_data and "path" in next_song_data:
+        audio.player.play(next_song_data["path"])
+    # Get the next song data to return
+    return next_song_data
     
 @app.get("/back")
 def prev_song():
-    return audio.jukebox.prev_node()
+    # Move to the previous song in the queue
+    prev_song_data = audio.jukebox.prev_node()
+    # Check if the previous song data is valid and has a path, then play it
+    if prev_song_data and "path" in prev_song_data:
+        audio.player.play(prev_song_data["path"])
+    # Get the previous song data to return
+    return prev_song_data
 
+@app.post("/play")
+# Play the song with the file path provided
+def play_song(song_path: str):
+    result = audio.player.play(song_path)
+    return result
+
+# Pause the song playing
+@app.post("/pause")
+def pause():
+    return audio.player.pause()
+
+# Set the volume level from 0 to 100
+@app.post("/volume")
+def set_volume(level: int):
+    if level < 0 or level > 100:
+        raise HTTPException(status_code=400, detail="Volume must be between 0 and 100")
+    return audio.player.set_volume(level)
+
+# Get the status of the song playing
+@app.get("/status")
+def get_status():
+    return audio.player.get_status()
+
+# Get the current progress of the song in terms of time and the percentage of the song completed
+@app.get("/progress")
+def get_progress():
+    return audio.player.get_progress()
+
+# Switch to a different point in the song in ms
+@app.post("/seek")
+def seek(position_ms: int):
+    if position_ms < 0:
+        raise HTTPException(status_code=400, detail="Position must be non-negative")
+    return audio.player.seek(position_ms)
+
+# Flag to determine if the auto advance is running
+auto_advance_running = False
+
+# Add a background task to see if the song is done and if it is then go to the next song in the queue and play it
+async def auto_advance_task():
+    global auto_advance_running
+    auto_advance_running = True
+    
+    # Loop to check if the song is done every second and if it is then go to the next song in the queue and play it
+    while auto_advance_running:
+        # Check if the song is finished or not
+        if audio.player.is_finished() and audio.jukebox is not None:
+            try:
+                next_song_data = audio.jukebox.next_node()
+                # Check if the next song data is valid and has a path, then play it
+                if next_song_data and "path" in next_song_data:
+                    audio.player.play(next_song_data["path"])
+                    print(f"Auto-advanced to: {next_song_data.get('name', 'Unknown')}")
+            except HTTPException:
+                print("Reached end of queue")
+        
+        # Wait for a sec before checking again
+        await asyncio.sleep(1)
+
+# Start the auto advance when the app is running
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(auto_advance_task())
+
+# Stop the auto advance when the app is shutting down
+@app.on_event("shutdown")
+async def shutdown_event():
+    global auto_advance_running
+    auto_advance_running = False
+    
+@app.get("/queue")
+def get_queue():
+    if audio.jukebox is None:
+        return []
+    songs = []
+    node = audio.jukebox.head
+    while node:
+        songs.append(node.data)
+        node = node.next
+    return songs
+
+@app.delete("/queue/{index}")
+def remove_from_queue(index: int):
+    if audio.jukebox is None:
+        raise HTTPException(status_code=404, detail="Queue does not exist")
+    node = audio.jukebox.head
+    i = 0
+    while node:
+        if i == index:
+            if node.prev:
+                node.prev.next = node.next
+            else:
+                audio.jukebox.head = node.next
+            if node.next:
+                node.next.prev = node.prev
+            else:
+                audio.jukebox.tail = node.prev
+            if audio.jukebox.curr == node:
+                audio.jukebox.curr = node.next or node.prev
+            audio.jukebox.size -= 1
+            return {"status": "removed", "index": index}
+        node = node.next
+        i += 1
+    raise HTTPException(status_code=404, detail="Index out of range")
+    
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

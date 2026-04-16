@@ -2,7 +2,8 @@ from tinytag import TinyTag
 import os
 
 # hardcoded for now for testing purposes
-MUSIC_FOLDER = r"C:\Users\atene\Documents\RIT-SHPE-2026-Jukebox-Project\jukebox-backend\music"
+# need to change this to your file path
+MUSIC_FOLDER = os.path.join(os.path.dirname(__file__), "music")
 
 def get_library():
     """
@@ -33,6 +34,7 @@ def get_library():
                 "file_path": file_path,
                 "artist":    tag.artist or "Unknown",
                 "album":     tag.album or "Unknown",
+                "duration":  int(tag.duration * 1000) if tag.duration else 0, 
             })
     return songs
 

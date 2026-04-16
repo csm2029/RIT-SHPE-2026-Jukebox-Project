@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
+import vlc
 
 class Node:
     def __init__(self, data):
