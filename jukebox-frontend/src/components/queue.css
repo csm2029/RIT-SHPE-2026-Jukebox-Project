@@ -196,3 +196,10 @@
   font-size: 0.68rem !important;
   opacity: 0.6;
 }
+
+.queue-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}

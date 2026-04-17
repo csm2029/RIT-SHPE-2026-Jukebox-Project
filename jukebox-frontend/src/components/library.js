@@ -45,9 +45,12 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
       <ul className="song-list">
         {songs.map((song, i) => (
           <li key={i} className="song-item" onClick={() => handlePlay(song)}>
-            <div className="song-art">
-              <span className="song-art-placeholder">♪</span>
-              <div className="play-overlay">▶</div>
+            <div className="queue-art">
+              {song.cover ? (
+                <img src={song.cover} alt="cover" className="queue-art-img" />
+              ) : (
+                <span>♪</span>
+              )}
             </div>
             <div className="song-info">
               <span className="song-name">{song.name}</span>
