@@ -36,6 +36,11 @@ def get_song(name: str):
         raise HTTPException(status_code=404, detail="Song not found")
     return result
 
+def require_queue():
+    #  Check if the jukebox queue is created, if not return an error
+    if audio.jukebox is None:
+        raise HTTPException(status_code=404, detail="Queue not created. POST /create first.")
+
 # Queue Endpoints
 @app.post("/create")
 def create_queue():
@@ -43,25 +48,28 @@ def create_queue():
 
 @app.post("/add")
 def enqueue_song(song : dict):
+    require_queue()
     return audio.jukebox.enqueue(song)
 
 @app.get("/next")
 def next_song():
+    require_queue()
     # Move to the next song in the queue
     next_song_data = audio.jukebox.next_node()
     # Check if the next song data is valid and has a path, then play it
-    if next_song_data and "path" in next_song_data:
-        audio.player.play(next_song_data["path"])
+    if next_song_data and "file_path" in next_song_data:
+        audio.player.play(next_song_data["file_path"])
     # Get the next song data to return
     return next_song_data
     
 @app.get("/back")
 def prev_song():
+    require_queue()
     # Move to the previous song in the queue
     prev_song_data = audio.jukebox.prev_node()
     # Check if the previous song data is valid and has a path, then play it
-    if prev_song_data and "path" in prev_song_data:
-        audio.player.play(prev_song_data["path"])
+    if prev_song_data and "file_path" in prev_song_data:
+        audio.player.play(prev_song_data["file_path"])
     # Get the previous song data to return
     return prev_song_data
 
@@ -114,9 +122,9 @@ async def auto_advance_task():
         if audio.player.is_finished() and audio.jukebox is not None:
             try:
                 next_song_data = audio.jukebox.next_node()
-                # Check if the next song data is valid and has a path, then play it
-                if next_song_data and "path" in next_song_data:
-                    audio.player.play(next_song_data["path"])
+                # Check if the next song data is valid and has a file_path, then play it
+                if next_song_data and "file_path" in next_song_data:
+                    audio.player.play(next_song_data["file_path"])
                     print(f"Auto-advanced to: {next_song_data.get('name', 'Unknown')}")
             except HTTPException:
                 print("Reached end of queue")
@@ -148,12 +156,13 @@ def get_queue():
 
 @app.delete("/queue/{index}")
 def remove_from_queue(index: int):
-    if audio.jukebox is None:
-        raise HTTPException(status_code=404, detail="Queue does not exist")
+    require_queue()
     node = audio.jukebox.head
     i = 0
     while node:
         if i == index:
+            is_current = (audio.jukebox.curr == node)
+
             if node.prev:
                 node.prev.next = node.next
             else:
@@ -162,7 +171,7 @@ def remove_from_queue(index: int):
                 node.next.prev = node.prev
             else:
                 audio.jukebox.tail = node.prev
-            if audio.jukebox.curr == node:
+            if is_current:
                 audio.jukebox.curr = node.next or node.prev
             audio.jukebox.size -= 1
             return {"status": "removed", "index": index}

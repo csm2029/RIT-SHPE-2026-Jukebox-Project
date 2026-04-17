@@ -24,14 +24,14 @@ export default function Controls({
   const handleNext = async () => {
     try {
       const data = await nextSong();
-      if (onNext) onNext(data);
+      if (onNext && data && data.file_path) onNext(data);
     } catch (e) {}
   };
 
   const handlePrev = async () => {
     try {
       const data = await prevSong();
-      if (onPrev) onPrev(data);
+      if (onPrev && data && data.file_path) onPrev(data);
     } catch (e) {}
   };
 

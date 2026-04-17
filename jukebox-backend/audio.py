@@ -40,6 +40,8 @@ class Queue:
 
     def next_node(self):
         curr = self.curr
+        if curr is None:
+            raise HTTPException(status_code=409, detail="Queue is empty")
         if curr == self.tail:
             raise HTTPException(status_code=409, detail="Cannot go past the end of the Queue")
         
@@ -51,6 +53,8 @@ class Queue:
 
     def prev_node(self):
         curr = self.curr
+        if curr is None:
+            raise HTTPException(status_code=409, detail="Queue is empty")
         if curr == self.head:
             raise HTTPException(status_code=409, detail="Cannot go past the beginning of the Queue")
     
@@ -129,10 +133,10 @@ class AudioPlayer:
 jukebox = None
 player = AudioPlayer()
 
-def create_queue():
+def create_queue(force = False):
     global jukebox
-    if jukebox is not None:
+    if jukebox is not None and not force:
         return JSONResponse(status_code=409, content={"message": "Queue already exists"})
 
     jukebox = Queue()
-    return JSONResponse(status_code=200, content={"message": "Sucessfully created a Queue"})
+    return JSONResponse(status_code=200, content={"message": "Successfully created a Queue"})

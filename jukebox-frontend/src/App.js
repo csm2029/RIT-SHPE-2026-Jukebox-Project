@@ -3,7 +3,7 @@ import Library from "./components/library";
 import Queue from "./components/queue";
 import Now_Playing from "./components/now_playing";
 import Controls from "./components/controls";
-import { createQueue, getProgress, getStatus, seekTo } from "./api";
+import { createQueue, getProgress, getStatus, seekTo, getQueue } from "./api";
 import "./App.css";
 
 export default function App() {
@@ -16,6 +16,8 @@ export default function App() {
   const [queueTotal, setQueueTotal] = useState(0);
   const [queueRefresh, setQueueRefresh] = useState(0);
   const pollRef = useRef(null);
+  const isSeekingRef = useRef(false);
+  const seekTargetRef = useRef(null);
 
   // Create queue on mount
   useEffect(() => {
@@ -32,15 +34,38 @@ export default function App() {
     pollRef.current = setInterval(async () => {
       try {
         const [prog, status] = await Promise.all([getProgress(), getStatus()]);
-        setProgress({ ...prog });
+        if (!isSeekingRef.current) {
+          setProgress({ ...prog });
+        } else if (seekTargetRef.current !== null) {
+          const diff = Math.abs(prog.current_time - seekTargetRef.current);
+          if (diff < 2000) {
+            isSeekingRef.current = false;
+            seekTargetRef.current = null;
+            setProgress({ ...prog });
+          }
+        }
         setIsPlaying(status.state === "Playing");
   
         if (status.current_song && (!currentSongRef.current || status.current_song !== currentSongRef.current.file_path)) {
-          setCurrentSong((prev) =>
-            prev
-              ? { ...prev, file_path: status.current_song }
-              : { name: status.current_song, artist: "", album: "", file_path: status.current_song }
-          );
+          try {
+            const queue = await getQueue();
+            const match = Array.isArray(queue) && queue.find(s => s.file_path === status.current_song);
+            if (match) {
+              setCurrentSong({ ...match });
+            } else {
+              setCurrentSong((prev) =>
+                prev
+                  ? { ...prev, file_path: status.current_song }
+                  : { name: status.current_song, artist: "", album: "", file_path: status.current_song }
+              );
+            }
+          } catch {
+            setCurrentSong((prev) =>
+              prev
+                ? { ...prev, file_path: status.current_song }
+                : { name: status.current_song, artist: "", album: "", file_path: status.current_song }
+            );
+          }
           setQueueRefresh((n) => n + 1);
         }
       } catch (e) {}
@@ -56,6 +81,7 @@ export default function App() {
 
   const handleSeek = (ms) => {
     seekTo(ms);
+    seekTargetRef.current = ms;
   };
 
   const handleNext = (song) => {
@@ -118,7 +144,7 @@ export default function App() {
         </section>
 
         <section className="app-panel app-panel--now-playing">
-          <Now_Playing currentSong={currentSong} progress={progress} onSeek={handleSeek} />
+          <Now_Playing currentSong={currentSong} progress={progress} onSeek={handleSeek} isSeeking={isSeekingRef} />
         </section>
 
         <section className="app-panel app-panel--queue">

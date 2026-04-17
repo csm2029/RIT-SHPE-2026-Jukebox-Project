@@ -14,13 +14,17 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
   }, []);
 
   const handlePlay = async (song) => {
+    if (queueCreated) {
+      await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album });
+      if (onAddToQueue) onAddToQueue();
+    }
     await playSong(song.file_path);
     if (onSongPlay) onSongPlay(song);
   };
 
   const handleAddToQueue = async (song) => {
     if (!queueCreated) return;
-    await addToQueue({ name: song.name, path: song.file_path, artist: song.artist, album: song.album });
+    await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album });
     setAddedMap((prev) => ({ ...prev, [song.name]: true }));
     setTimeout(() => setAddedMap((prev) => ({ ...prev, [song.name]: false })), 1500);
     if (onAddToQueue) onAddToQueue(); // notify App.js to refresh queue
