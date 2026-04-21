@@ -54,14 +54,24 @@ def enqueue_song(song : dict):
 @app.get("/next")
 def next_song():
     require_queue()
-    # Move to the next song in the queue
+    
+    # If current playing song doesn't match curr, reset curr to head
+    current_playing = audio.player.current_song
+    if current_playing and audio.jukebox.curr:
+        if audio.jukebox.curr.data.get("file_path") != current_playing:
+            # Find the actual current song in queue
+            node = audio.jukebox.head
+            while node:
+                if node.data.get("file_path") == current_playing:
+                    audio.jukebox.curr = node
+                    break
+                node = node.next
+
     next_song_data = audio.jukebox.next_node()
-    # Check if the next song data is valid and has a path, then play it
     if next_song_data and "file_path" in next_song_data:
         audio.player.play(next_song_data["file_path"])
-    # Get the next song data to return
     return next_song_data
-    
+
 @app.get("/back")
 def prev_song():
     require_queue()
@@ -153,6 +163,45 @@ def get_queue():
         songs.append(node.data)
         node = node.next
     return songs
+
+@app.post("/play-from-queue")
+def play_from_queue(song: dict):
+    song_path = song.get("file_path")
+    if audio.jukebox is not None:
+        # Search for the song in the queue
+        node = audio.jukebox.head
+        found = False
+        while node:
+            if node.data.get("file_path") == song_path:
+                audio.jukebox.curr = node
+                found = True
+                break
+            node = node.next
+        
+        # If not in queue, insert it at the front before curr
+        if not found:
+            new_node = audio.Node(song)
+            curr = audio.jukebox.curr
+
+            if curr is None:
+                # Queue is empty, just enqueue normally
+                audio.jukebox.enqueue(song)
+                audio.jukebox.curr = audio.jukebox.tail
+            else:
+                # Insert before curr
+                prev = curr.prev
+                new_node.next = curr
+                new_node.prev = prev
+                curr.prev = new_node
+                if prev:
+                    prev.next = new_node
+                else:
+                    audio.jukebox.head = new_node
+                audio.jukebox.size += 1
+                audio.jukebox.curr = new_node
+
+    result = audio.player.play(song_path)
+    return result
 
 @app.delete("/queue/{index}")
 def remove_from_queue(index: int):

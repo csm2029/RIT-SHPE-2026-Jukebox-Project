@@ -86,3 +86,12 @@ export async function seekTo(positionMs) {
   });
   return res.json();
 }
+
+export async function playFromQueue(song) {
+  const res = await fetch(`${BASE_URL}/play-from-queue`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(song),
+  });
+  return res.json();
+}

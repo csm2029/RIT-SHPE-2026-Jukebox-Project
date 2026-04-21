@@ -204,3 +204,37 @@
   object-fit: cover;
   border-radius: inherit;
 }
+
+.queue-sections {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 106, 0, 0.3) transparent;
+}
+ 
+.queue-sections::-webkit-scrollbar { width: 3px; }
+.queue-sections::-webkit-scrollbar-thumb {
+  background: rgba(255, 106, 0, 0.3);
+  border-radius: 3px;
+}
+ 
+.queue-section {
+  margin-bottom: 8px;
+}
+ 
+.queue-section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+ 
+.queue-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}

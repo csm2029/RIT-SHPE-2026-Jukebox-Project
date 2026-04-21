@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchLibrary, addToQueue, playSong } from "../api";
+import { fetchLibrary, addToQueue, playFromQueue } from "../api";
 import "./library.css";
 
 export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
@@ -14,11 +14,14 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
   }, []);
 
   const handlePlay = async (song) => {
-    if (queueCreated) {
-      await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album, cover: song.cover });
-      if (onAddToQueue) onAddToQueue();
-    }
-    await playSong(song.file_path);
+    await playFromQueue({
+      file_path: song.file_path,
+      name: song.name,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      cover: song.cover
+    });
     if (onSongPlay) onSongPlay(song);
   };
 
