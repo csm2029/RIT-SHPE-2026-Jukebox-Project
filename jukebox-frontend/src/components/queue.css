@@ -3,7 +3,7 @@
   border: 1px solid rgba(255, 106, 0, 0.2);
   border-top: 2px solid #ff6a00;
   border-radius: 16px;
-  padding: 20px;
+  padding: 10px 12px;
   height: 100%;
   overflow: hidden;
   display: flex;
@@ -13,22 +13,22 @@
 }
 
 .queue-header {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .queue-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.1rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #ff6a00;
-  margin: 0 0 4px 0;
+  margin: 0 0 2px 0;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   text-shadow: 0 0 12px rgba(255, 106, 0, 0.6);
 }
 
 .queue-count {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   color: rgba(255, 255, 255, 0.4);
   font-family: 'Space Mono', monospace;
 }
@@ -43,21 +43,22 @@
   scrollbar-color: rgba(255, 106, 0, 0.3) transparent;
 }
 
-.queue-list::-webkit-scrollbar { width: 4px; }
+.queue-list::-webkit-scrollbar { width: 3px; }
 .queue-list::-webkit-scrollbar-thumb {
   background: rgba(255, 106, 0, 0.3);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .queue-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
+  padding: 10px 10px;
   border-radius: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   border: 1px solid transparent;
   transition: background 0.2s;
+  min-height: 54px;
 }
 
 .queue-item:hover {
@@ -71,9 +72,9 @@
 }
 
 .queue-index {
-  width: 22px;
+  width: 20px;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   color: rgba(255, 255, 255, 0.35);
   font-family: 'Space Mono', monospace;
   flex-shrink: 0;
@@ -105,8 +106,8 @@
 }
 
 .queue-art {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   background: linear-gradient(135deg, rgba(255, 106, 0, 0.3), rgba(255, 230, 0, 0.2));
   display: flex;
@@ -123,7 +124,7 @@
 
 .queue-song-name {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
@@ -135,7 +136,7 @@
 
 .queue-song-artist {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.4);
   white-space: nowrap;
   overflow: hidden;
@@ -143,20 +144,20 @@
 }
 
 .queue-duration {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.3);
   font-family: 'Space Mono', monospace;
   flex-shrink: 0;
 }
 
 .queue-remove-btn {
-  width: 24px;
-  height: 24px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   background: transparent;
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -189,10 +190,10 @@
 
 .queue-empty p {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .queue-empty-sub {
-  font-size: 0.68rem !important;
+  font-size: 0.65rem !important;
   opacity: 0.6;
 }

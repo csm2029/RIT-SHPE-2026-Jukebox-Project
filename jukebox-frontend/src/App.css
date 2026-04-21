@@ -150,7 +150,6 @@ html, body {
   display: none;
 }
 
-/* ── Main 3-column layout ── */
 .app-main {
   position: relative;
   z-index: 10;
@@ -168,7 +167,6 @@ html, body {
   min-height: 0;
 }
 
-/* ── Footer ── */
 .app-footer {
   position: relative;
   z-index: 10;
@@ -180,24 +178,21 @@ html, body {
   box-shadow: 0 -1px 20px rgba(255, 0, 200, 0.08);
 }
 
-/* ── Scrollbar global ── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 0, 200, 0.3); border-radius: 3px; }
 
-/* ── 800x480 component overrides ── */
 
-/* Library */
 .library {
   padding: 10px 12px;
 }
 
 .library-title {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .library-count {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
 }
 
 .library-header {
@@ -205,101 +200,104 @@ html, body {
 }
 
 .song-item {
-  padding: 6px 8px;
-  margin-bottom: 3px;
-  gap: 8px;
+  padding: 10px 10px;
+  margin-bottom: 6px;
+  gap: 10px;
+  min-height: 60px;
 }
 
 .song-art {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
 }
 
 .song-art-placeholder {
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 .song-name {
-  font-size: 0.72rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .song-artist {
-  font-size: 0.6rem;
+  font-size: 0.68rem;
 }
 
-
 .song-duration {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
 }
 
 .add-queue-btn {
-  width: 22px;
-  height: 22px;
-  font-size: 0.9rem;
+  width: 42px !important;
+  height: 42px !important;
+  font-size: 1.4rem !important;
+  border-width: 1.5px !important;
 }
 
-/* Now Playing */
 .now-playing {
-  padding: 8px 12px;
-  gap: 8px;
+  padding: 10px 14px;
+  gap: 10px;
 }
 
 .np-art {
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
 }
 
 .np-art-icon {
-  font-size: 2rem;
+  font-size: 3rem;
 }
 
 .np-song-name {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 240px;
+  max-width: 100%;
 }
 
 .np-artist {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 240px;
+  max-width: 100%;
 }
 
 .np-album {
-  font-size: 0.58rem;
-}
-
-.np-times {
   font-size: 0.6rem;
 }
 
+.np-times {
+  font-size: 0.62rem;
+}
+
 .np-progress-track {
-  height: 3px;
+  height: 5px;
+}
+
+.np-progress-bar {
+  padding: 10px 0;
 }
 
 .np-progress-head {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
-/* Queue */
 .queue {
   padding: 10px 12px;
 }
 
 .queue-title {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .queue-count {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
 }
 
 .queue-header {
@@ -307,74 +305,75 @@ html, body {
 }
 
 .queue-item {
-  padding: 6px 8px;
-  margin-bottom: 3px;
-  gap: 8px;
+  padding: 10px 10px;
+  margin-bottom: 6px;
+  gap: 10px;
+  min-height: 60px;
 }
 
 .queue-art {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 
 .queue-song-name {
-  font-size: 0.72rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .queue-song-artist {
-  font-size: 0.6rem;
+  font-size: 0.68rem;
 }
 
 .queue-duration {
-  font-size: 0.6rem;
+  font-size: 0.68rem;
 }
 
 .queue-remove-btn {
-  width: 20px;
-  height: 20px;
-  font-size: 0.6rem;
+  width: 42px !important;
+  height: 42px !important;
+  font-size: 0.9rem !important;
+  border-width: 1.5px !important;
 }
 
 .queue-index {
-  font-size: 0.65rem;
-  width: 16px;
+  font-size: 0.68rem;
+  width: 20px;
 }
 
 .queue-empty p {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
 }
 
-/* Controls */
 .controls {
   padding: 0 16px;
   height: 72px;
 }
 
 .ctrl-btn--play {
-  width: 46px;
-  height: 46px;
+  width: 62px !important;
+  height: 62px !important;
 }
 
 .ctrl-btn--skip {
-  width: 34px;
-  height: 34px;
+  width: 52px !important;
+  height: 52px !important;
 }
 
 .ctrl-vol-slider {
-  width: 65px;
+  width: 80px;
 }
 
 .ctrl-vol-value {
-  font-size: 0.62rem;
-  min-width: 24px;
+  font-size: 0.65rem;
+  min-width: 28px;
 }
 
 .ctrl-badge {
-  font-size: 0.62rem;
-  padding: 3px 8px;
+  font-size: 0.65rem;
+  padding: 4px 10px;
 }
 
 .ctrl-position {

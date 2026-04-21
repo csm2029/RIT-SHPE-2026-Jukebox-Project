@@ -18,12 +18,12 @@
   align-items: center;
   gap: 6px;
   font-family: 'Space Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(0, 255, 136, 0.2);
   border-radius: 20px;
-  padding: 4px 12px;
+  padding: 4px 10px;
 }
 
 .ctrl-badge--empty {
@@ -49,7 +49,7 @@
   justify-self: center;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .ctrl-btn {
@@ -65,8 +65,8 @@
 }
 
 .ctrl-btn--skip {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border: 1.5px solid rgba(0, 255, 255, 0.5);
   background: transparent;
   box-shadow: 0 0 8px rgba(0, 255, 255, 0.3), inset 0 0 8px rgba(0, 255, 255, 0.05);
@@ -81,12 +81,12 @@
 }
 
 .ctrl-btn--play {
-  width: 60px;
-  height: 60px;
+  width: 62px;
+  height: 62px;
   background: transparent;
   color: #ff00c8;
   border: 2px solid #ff00c8;
-  box-shadow: 
+  box-shadow:
     0 0 12px rgba(255, 0, 200, 0.7),
     0 0 30px rgba(255, 0, 200, 0.3),
     inset 0 0 12px rgba(255, 0, 200, 0.1);
@@ -95,7 +95,7 @@
 
 .ctrl-btn--play:hover:not(:disabled) {
   transform: scale(1.08);
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(255, 0, 200, 0.9),
     0 0 50px rgba(255, 0, 200, 0.4),
     inset 0 0 20px rgba(255, 0, 200, 0.15);
@@ -109,7 +109,6 @@
   opacity: 0.3;
   cursor: not-allowed;
 }
-
 
 /* ── Volume ── */
 .ctrl-volume {
@@ -133,7 +132,7 @@
   -webkit-appearance: none;
   appearance: none;
   width: 90px;
-  height: 4px;
+  height: 5px;
   background: linear-gradient(90deg, rgba(0, 255, 136, 0.4), rgba(0, 255, 255, 0.2));
   border-radius: 4px;
   outline: none;
@@ -142,8 +141,8 @@
 
 .ctrl-vol-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: linear-gradient(135deg, #ffe600, #ff6a00);
   box-shadow: 0 0 8px rgba(255, 230, 0, 0.7), 0 0 16px rgba(255, 106, 0, 0.4);
@@ -156,8 +155,8 @@
 }
 
 .ctrl-vol-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: linear-gradient(135deg, #ffe600, #ff6a00);
   border: none;
@@ -166,8 +165,8 @@
 
 .ctrl-vol-value {
   font-family: 'Space Mono', monospace;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.4);
-  min-width: 30px;
+  min-width: 28px;
   text-align: right;
 }
