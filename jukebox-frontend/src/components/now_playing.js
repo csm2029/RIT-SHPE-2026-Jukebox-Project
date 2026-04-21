@@ -74,7 +74,11 @@ export default function NowPlaying({ currentSong, progress, onSeek, isSeeking })
     <div className="now-playing">
       <div className="np-art-wrapper">
         <div className={`np-art ${currentSong ? "np-art--active" : ""}`}>
-          <span className="np-art-icon">♪</span>
+          {currentSong?.cover ? (
+            <img src={currentSong.cover} alt="Album Cover" className="np-art-img" />
+          ) : (
+            <span className="np-art-icon">♪</span>
+          )}
           <div className="np-art-glow" />
         </div>
       </div>

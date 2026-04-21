@@ -55,7 +55,11 @@ export default function Queue({ currentSong, refreshTrigger }) {
                   )}
                 </span>
                 <div className="queue-art">
-                  <span>♪</span>
+                  {song.cover ? (
+                    <img src={song.cover} alt="cover" className="queue-art-img" />
+                  ) : (
+                    <span>♪</span>
+                  )}
                 </div>
                 <div className="queue-song-info">
                   <span className="queue-song-name">{song.name}</span>

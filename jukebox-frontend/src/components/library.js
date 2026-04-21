@@ -15,7 +15,7 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
 
   const handlePlay = async (song) => {
     if (queueCreated) {
-      await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album });
+      await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album, cover: song.cover });
       if (onAddToQueue) onAddToQueue();
     }
     await playSong(song.file_path);
@@ -24,7 +24,7 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
 
   const handleAddToQueue = async (song) => {
     if (!queueCreated) return;
-    await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album });
+    await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album, cover: song.cover });
     setAddedMap((prev) => ({ ...prev, [song.name]: true }));
     setTimeout(() => setAddedMap((prev) => ({ ...prev, [song.name]: false })), 1500);
     if (onAddToQueue) onAddToQueue(); // notify App.js to refresh queue
@@ -50,7 +50,11 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
         {songs.map((song, i) => (
           <li key={i} className="song-item" onClick={() => handlePlay(song)}>
             <div className="song-art">
-              <span className="song-art-placeholder">♪</span>
+              {song.cover ? (
+                <img src={song.cover} alt="cover" className="song-art-img" />
+              ) : (
+                <span className="song-art-placeholder">♪</span>
+              )}
               <div className="play-overlay">▶</div>
             </div>
             <div className="song-info">

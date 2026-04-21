@@ -183,3 +183,10 @@
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
 }
+
+.song-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
