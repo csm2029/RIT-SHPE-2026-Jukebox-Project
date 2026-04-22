@@ -35,11 +35,14 @@ async def auto_advance_task():
 
 @app.on_event("startup")
 async def startup_event():
+    create_queue();
+    audio.jukebox.reinstate_queue() # handle reinstating the queue from persistence
     asyncio.create_task(auto_advance_task())
 
 @app.on_event("shutdown")
 async def shutdown_event():
     global auto_advance_running
+    audio.jukebox.save_queue(); # handle saving the queue to persistence
     auto_advance_running = False
 
 # ─── General ──────────────────────────────────────────────────────────────────
@@ -70,7 +73,7 @@ def require_queue():
     if audio.jukebox is None:
         raise HTTPException(status_code=404, detail="Queue not created. POST /create first.")
 
-# Queue Endpoints
+# ─── Queue ──────────────────────────────────────────────────────────────────
 @app.post("/create")
 def create_queue():
     return audio.create_queue(force=True)
@@ -154,17 +157,6 @@ async def auto_advance_task():
                     print("Reached end of queue")
         
         await asyncio.sleep(1)
-
-# Start the auto advance when the app is running
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(auto_advance_task())
-
-# Stop the auto advance when the app is shutting down
-@app.on_event("shutdown")
-async def shutdown_event():
-    global auto_advance_running
-    auto_advance_running = False
     
 @app.get("/queue")
 def get_queue():

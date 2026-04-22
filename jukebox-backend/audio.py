@@ -2,6 +2,8 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 import vlc
 import time
+import storage
+
 class Node:
     def __init__(self, data):
         self.data = data
@@ -17,15 +19,25 @@ class Queue:
 
     def enqueue(self, data):
         new_node = Node(data)
+        # Save a copy of the prev node to link back
         prev_node = self.tail
+
+        # Add the song to the end of the queue
         if self.tail:
             self.tail.next = new_node
+
+        # Set the song queued to the tail
         self.tail = new_node
+
+        # Set the prev of the new tail to the prev node
         self.tail.prev = prev_node
+
+        # If the queue is empty, have the curr node point to the head
         if self.head is None:
             self.head = new_node
             self.curr = new_node
         self.size += 1
+
         return new_node.data
 
     def next_node(self):
@@ -41,12 +53,6 @@ class Queue:
 
         return curr.data
 
-    def next_node(self):
-        if self.curr == self.tail:
-            raise HTTPException(status_code=409, detail="Cannot go past the end of the Queue")
-        self.curr = self.curr.next
-        return self.curr.data
-
     def prev_node(self):
         curr = self.curr
         if curr is None:
@@ -55,6 +61,21 @@ class Queue:
             raise HTTPException(status_code=409, detail="Cannot go past the beginning of the Queue")
         self.curr = self.curr.prev
         return self.curr.data
+    
+    def save_queue(self):
+        saved_queue = []
+        curr = self.head
+        while( curr != None):
+            saved_queue.append(curr.data)
+            curr = curr.next
+        return storage.save_queue(saved_queue) # return the result of saving the queue to persistence (for testing purposes)
+        
+    
+    def reinstate_queue(self):
+        song_names = storage.load_queue() # load the queue from persistence
+        for song_name in song_names:
+            self.enqueue(song_name) # re-enqueue each song to reinstate the queue in memory
+        
 
 # ─── Audio Player ─────────────────────────────────────────────────────────────
 
@@ -100,7 +121,6 @@ class AudioPlayer:
         if state != vlc.State.Ended:
             return False
         return (time.time() - self.last_manual_play_time) > 3
-    
 
 # ─── Module-level instances ───────────────────────────────────────────────────
 
