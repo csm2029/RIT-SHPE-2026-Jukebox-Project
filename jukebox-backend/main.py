@@ -129,12 +129,15 @@ async def auto_advance_task():
 # Start the auto advance when the app is running
 @app.on_event("startup")
 async def startup_event():
+    create_queue();
+    audio.jukebox.reinstate_queue();
     asyncio.create_task(auto_advance_task())
 
 # Stop the auto advance when the app is shutting down
 @app.on_event("shutdown")
 async def shutdown_event():
     global auto_advance_running
+    audio.jukebox.save_queue();
     auto_advance_running = False
     
 @app.get("/queue")

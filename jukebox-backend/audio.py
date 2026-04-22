@@ -2,6 +2,8 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 import vlc
 import time
+import storage
+
 class Node:
     def __init__(self, data):
         self.data =  data
@@ -63,6 +65,21 @@ class Queue:
         self.curr = curr
 
         return curr.data
+    
+    def save_queue(self):
+        saved_queue = []
+        curr = self.head
+        while( curr != None):
+            saved_queue.append(curr.data)
+            curr = curr.next
+        return storage.save_queue(saved_queue) # return the result of saving the queue to persistence (for testing purposes)
+        
+    
+    def reinstate_queue(self):
+        song_names = storage.load_queue() # load the queue from persistence
+        for song_name in song_names:
+            self.enqueue(song_name) # re-enqueue each song to reinstate the queue in memory
+
 
 # Class for the audio player with play, pause, volume control, and status
 class AudioPlayer:
