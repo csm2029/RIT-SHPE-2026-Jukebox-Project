@@ -2,9 +2,6 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 import vlc
 import time
-
-# ─── Nodes & Queue ────────────────────────────────────────────────────────────
-
 class Node:
     def __init__(self, data):
         self.data = data
@@ -31,25 +28,17 @@ class Queue:
         self.size += 1
         return new_node.data
 
-    def dequeue(self, data):
-        if self.size == 0:
-            return
-        curr = self.head
-        while curr is not None and curr.data != data:
-            curr = curr.next
-            if curr is None:
-                raise HTTPException(status_code=404, detail="Song not found in the Queue")
-        prev_node, next_node = curr.prev, curr.next
-        if prev_node:
-            prev_node.next = next_node
-        else:
-            self.head = next_node
-        if next_node:
-            next_node.prev = prev_node
-        else:
-            self.tail = prev_node
-        self.curr = next_node if next_node else prev_node
-        self.size -= 1
+    def next_node(self):
+        curr = self.curr
+        if curr is None:
+            raise HTTPException(status_code=409, detail="Queue is empty")
+        if curr == self.tail:
+            raise HTTPException(status_code=409, detail="Cannot go past the end of the Queue")
+        
+        curr = curr.next
+        # Update curr
+        self.curr = curr
+
         return curr.data
 
     def next_node(self):
@@ -59,7 +48,10 @@ class Queue:
         return self.curr.data
 
     def prev_node(self):
-        if self.curr == self.head:
+        curr = self.curr
+        if curr is None:
+            raise HTTPException(status_code=409, detail="Queue is empty")
+        if curr == self.head:
             raise HTTPException(status_code=409, detail="Cannot go past the beginning of the Queue")
         self.curr = self.curr.prev
         return self.curr.data
@@ -68,18 +60,17 @@ class Queue:
 
 class AudioPlayer:
     def __init__(self):
-        self.instance = vlc.Instance()
-        self.media_player = self.instance.media_player_new()
-        self.current_path = None
-        self.start_time = None
+        instance = vlc.Instance('--vout=dummy', '--aout=alsa', '--no-xlib')
+        self.player = instance.media_player_new()
+        self.current_song = None
+        self.last_manual_play_time = 0
 
-    def play(self, path: str):
-        media = self.instance.media_new(path)
-        self.media_player.set_media(media)
-        self.media_player.play()
-        self.current_path = path
-        self.start_time = time.time()
-        return {"status": "playing", "path": path}
+    def play(self, file_path):
+        self.player.set_media(vlc.Media(file_path))
+        self.player.play()
+        self.current_song = file_path
+        self.last_manual_play_time = time.time()
+        return {"status": "playing", "song": file_path}
 
     def pause(self):
         self.media_player.pause()
@@ -105,16 +96,18 @@ class AudioPlayer:
         return {"seeked_to_ms": position_ms}
 
     def is_finished(self):
-        return self.media_player.get_state() == vlc.State.Ended
+        state = self.player.get_state()
+        if state != vlc.State.Ended:
+            return False
+        return (time.time() - self.last_manual_play_time) > 3
+    
 
 # ─── Module-level instances ───────────────────────────────────────────────────
 
 player = AudioPlayer()   # ← this is what main.py was looking for
 jukebox = None
 
-def create_queue():
+def create_queue(force=True):
     global jukebox
-    if jukebox is not None:
-        return JSONResponse(status_code=409, content={"message": "Queue already exists"})
     jukebox = Queue()
     return JSONResponse(status_code=200, content={"message": "Successfully created a Queue"})

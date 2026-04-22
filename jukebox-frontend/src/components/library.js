@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchLibrary, addToQueue, playSong } from "../api";
+import { fetchLibrary, addToQueue, playFromQueue } from "../api";
 import "./library.css";
 
 export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
@@ -14,13 +14,20 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
   }, []);
 
   const handlePlay = async (song) => {
-    await playSong(song.file_path);
+    await playFromQueue({
+      file_path: song.file_path,
+      name: song.name,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      cover: song.cover
+    });
     if (onSongPlay) onSongPlay(song);
   };
 
   const handleAddToQueue = async (song) => {
     if (!queueCreated) return;
-    await addToQueue({ name: song.name, path: song.file_path, artist: song.artist, album: song.album });
+    await addToQueue({ name: song.name, file_path: song.file_path, artist: song.artist, album: song.album, cover: song.cover });
     setAddedMap((prev) => ({ ...prev, [song.name]: true }));
     setTimeout(() => setAddedMap((prev) => ({ ...prev, [song.name]: false })), 1500);
     if (onAddToQueue) onAddToQueue(); // notify App.js to refresh queue
@@ -45,12 +52,13 @@ export default function Library({ onSongPlay, queueCreated, onAddToQueue }) {
       <ul className="song-list">
         {songs.map((song, i) => (
           <li key={i} className="song-item" onClick={() => handlePlay(song)}>
-            <div className="queue-art">
+            <div className="song-art">
               {song.cover ? (
-                <img src={song.cover} alt="cover" className="queue-art-img" />
+                <img src={song.cover} alt="cover" className="song-art-img" />
               ) : (
-                <span>♪</span>
+                <span className="song-art-placeholder">♪</span>
               )}
+              <div className="play-overlay">▶</div>
             </div>
             <div className="song-info">
               <span className="song-name">{song.name}</span>
