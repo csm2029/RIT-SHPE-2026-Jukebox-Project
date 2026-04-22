@@ -24,7 +24,7 @@ export default function Controls({
   const handleNext = async () => {
     try {
       const data = await nextSong();
-      if (onNext && data && data.file_path) onNext(data);
+      if (onNext) onNext(data);
     } catch (e) {}
   };
 

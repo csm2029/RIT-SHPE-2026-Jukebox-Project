@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 import vlc
-
+import time
 class Node:
     def __init__(self, data):
         self.data =  data
@@ -70,12 +70,13 @@ class AudioPlayer:
         instance = vlc.Instance('--vout=dummy', '--aout=alsa', '--no-xlib')
         self.player = instance.media_player_new()
         self.current_song = None
+        self.last_manual_play_time = 0
 
-    # Play a song with the given file path
     def play(self, file_path):
         self.player.set_media(vlc.Media(file_path))
         self.player.play()
         self.current_song = file_path
+        self.last_manual_play_time = time.time()
         return {"status": "playing", "song": file_path}
 
     # Set the status to paused
@@ -124,19 +125,17 @@ class AudioPlayer:
         self.player.set_time(position_ms)
         return {"status": "seeked", "position": position_ms}
 
-    # Set the state to stopped if the song is done
     def is_finished(self):
         state = self.player.get_state()
-        return state == vlc.State.Ended
+        if state != vlc.State.Ended:
+            return False
+        return (time.time() - self.last_manual_play_time) > 3
     
 
 jukebox = None
 player = AudioPlayer()
 
-def create_queue(force = False):
+def create_queue(force=True):
     global jukebox
-    if jukebox is not None and not force:
-        return JSONResponse(status_code=409, content={"message": "Queue already exists"})
-
     jukebox = Queue()
     return JSONResponse(status_code=200, content={"message": "Successfully created a Queue"})

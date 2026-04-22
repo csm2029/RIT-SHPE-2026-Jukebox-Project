@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import asyncio
-
+import time
 import library
 import audio
 
@@ -44,7 +44,7 @@ def require_queue():
 # Queue Endpoints
 @app.post("/create")
 def create_queue():
-    return audio.create_queue()
+    return audio.create_queue(force=True)
 
 @app.post("/add")
 def enqueue_song(song : dict):
@@ -54,19 +54,6 @@ def enqueue_song(song : dict):
 @app.get("/next")
 def next_song():
     require_queue()
-    
-    # If current playing song doesn't match curr, reset curr to head
-    current_playing = audio.player.current_song
-    if current_playing and audio.jukebox.curr:
-        if audio.jukebox.curr.data.get("file_path") != current_playing:
-            # Find the actual current song in queue
-            node = audio.jukebox.head
-            while node:
-                if node.data.get("file_path") == current_playing:
-                    audio.jukebox.curr = node
-                    break
-                node = node.next
-
     next_song_data = audio.jukebox.next_node()
     if next_song_data and "file_path" in next_song_data:
         audio.player.play(next_song_data["file_path"])
@@ -121,25 +108,22 @@ def seek(position_ms: int):
 # Flag to determine if the auto advance is running
 auto_advance_running = False
 
-# Add a background task to see if the song is done and if it is then go to the next song in the queue and play it
 async def auto_advance_task():
     global auto_advance_running
     auto_advance_running = True
     
-    # Loop to check if the song is done every second and if it is then go to the next song in the queue and play it
     while auto_advance_running:
-        # Check if the song is finished or not
         if audio.player.is_finished() and audio.jukebox is not None:
-            try:
-                next_song_data = audio.jukebox.next_node()
-                # Check if the next song data is valid and has a file_path, then play it
-                if next_song_data and "file_path" in next_song_data:
-                    audio.player.play(next_song_data["file_path"])
-                    print(f"Auto-advanced to: {next_song_data.get('name', 'Unknown')}")
-            except HTTPException:
-                print("Reached end of queue")
+            time_since_manual = time.time() - audio.player.last_manual_play_time
+            if time_since_manual > 3:
+                try:
+                    next_song_data = audio.jukebox.next_node()
+                    if next_song_data and "file_path" in next_song_data:
+                        audio.player.play(next_song_data["file_path"])
+                        print(f"Auto-advanced to: {next_song_data.get('name', 'Unknown')}")
+                except HTTPException:
+                    print("Reached end of queue")
         
-        # Wait for a sec before checking again
         await asyncio.sleep(1)
 
 # Start the auto advance when the app is running
@@ -158,7 +142,7 @@ def get_queue():
     if audio.jukebox is None:
         return []
     songs = []
-    node = audio.jukebox.head
+    node = audio.jukebox.curr
     while node:
         songs.append(node.data)
         node = node.next
@@ -168,7 +152,6 @@ def get_queue():
 def play_from_queue(song: dict):
     song_path = song.get("file_path")
     if audio.jukebox is not None:
-        # Search for the song in the queue
         node = audio.jukebox.head
         found = False
         while node:
@@ -177,29 +160,25 @@ def play_from_queue(song: dict):
                 found = True
                 break
             node = node.next
-        
-        # If not in queue, insert it at the front before curr
         if not found:
-            new_node = audio.Node(song)
-            curr = audio.jukebox.curr
-
-            if curr is None:
-                # Queue is empty, just enqueue normally
-                audio.jukebox.enqueue(song)
-                audio.jukebox.curr = audio.jukebox.tail
+            if audio.jukebox.curr is not None:
+                audio.jukebox.curr.data = song
+                audio.jukebox.curr.prev = None
+                audio.jukebox.head = audio.jukebox.curr
+                count = 0
+                n = audio.jukebox.head
+                while n:
+                    count += 1
+                    n = n.next
+                audio.jukebox.size = count
             else:
-                # Insert before curr
-                prev = curr.prev
-                new_node.next = curr
-                new_node.prev = prev
-                curr.prev = new_node
-                if prev:
-                    prev.next = new_node
-                else:
-                    audio.jukebox.head = new_node
-                audio.jukebox.size += 1
+                new_node = audio.Node(song)
+                audio.jukebox.head = new_node
+                audio.jukebox.tail = new_node
                 audio.jukebox.curr = new_node
+                audio.jukebox.size = 1
 
+    audio.player.last_manual_play_time = time.time()
     result = audio.player.play(song_path)
     return result
 
@@ -227,6 +206,28 @@ def remove_from_queue(index: int):
         node = node.next
         i += 1
     raise HTTPException(status_code=404, detail="Index out of range")
+
+
+@app.get("/reset-queue")
+def reset_queue():
+    return audio.create_queue(force=True)
+
+
+@app.get("/debug-queue")
+def debug_queue():
+    if audio.jukebox is None:
+        return {"error": "no queue"}
+    nodes = []
+    node = audio.jukebox.head
+    while node:
+        nodes.append({
+            "name": node.data.get("name"),
+            "is_curr": node == audio.jukebox.curr,
+            "is_head": node == audio.jukebox.head,
+            "is_tail": node == audio.jukebox.tail,
+        })
+        node = node.next
+    return {"size": audio.jukebox.size, "nodes": nodes}
     
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -18,10 +18,16 @@ export default function App() {
   const pollRef = useRef(null);
   const isSeekingRef = useRef(false);
   const seekTargetRef = useRef(null);
+  const prevStatusRef = useRef(null);
 
-  // Create queue on mount
+
   useEffect(() => {
-    createQueue().then(() => setQueueCreated(true)).catch(() => setQueueCreated(true));
+    createQueue().then(() => {
+      setQueueCreated(true);
+      setCurrentSong(null);
+      setIsPlaying(false);
+      setProgress({ current_time: 0, total_length: 0, percentage: 0 });
+    }).catch(() => setQueueCreated(true));
   }, []);
   const currentSongRef = useRef(null);
 
@@ -29,11 +35,11 @@ export default function App() {
     currentSongRef.current = currentSong;
   }, [currentSong]);
 
-  // Poll progress + status every second
   useEffect(() => {
     pollRef.current = setInterval(async () => {
       try {
         const [prog, status] = await Promise.all([getProgress(), getStatus()]);
+        
         if (!isSeekingRef.current) {
           setProgress({ ...prog });
         } else if (seekTargetRef.current !== null) {
@@ -44,7 +50,13 @@ export default function App() {
             setProgress({ ...prog });
           }
         }
+  
         setIsPlaying(status.state === "Playing");
+  
+        if (prevStatusRef.current !== status.current_song) {
+          prevStatusRef.current = status.current_song;
+          setQueueRefresh((n) => n + 1);
+        }
   
         if (status.current_song && (!currentSongRef.current || status.current_song !== currentSongRef.current.file_path)) {
           try {
@@ -84,9 +96,16 @@ export default function App() {
     seekTargetRef.current = ms;
   };
 
-  const handleNext = (song) => {
-    if (song) setCurrentSong({ ...song, file_path: song.file_path || song.path });
-    setQueueRefresh((n) => n + 1);
+  const handleNext = async (song) => {
+    if (song) {
+      setCurrentSong(null);
+      setTimeout(() => {
+        setCurrentSong({ ...song, file_path: song.file_path || song.path });
+        setQueueRefresh((n) => n + 1);
+      }, 100);
+    } else {
+      setQueueRefresh((n) => n + 1);
+    }
   };
   
   const handlePrev = (song) => {
