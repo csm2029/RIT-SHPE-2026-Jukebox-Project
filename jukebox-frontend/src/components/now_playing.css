@@ -107,6 +107,9 @@
 .np-progress-bar {
   cursor: pointer;
   padding: 10px 0;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .np-progress-track {

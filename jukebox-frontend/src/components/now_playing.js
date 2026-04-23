@@ -94,6 +94,7 @@ export default function NowPlaying({ currentSong, progress, onSeek, isSeeking })
           className="np-progress-bar"
           ref={barRef}
           onPointerDown={handlePointerDown}
+          onContextMenu={(e) => e.preventDefault()}
           title="Click or drag to seek"
           style={{ touchAction: "none" }}
         >
